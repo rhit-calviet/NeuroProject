@@ -6,225 +6,220 @@ import tensorflow as tf
 from flask import Flask, request, render_template, redirect, url_for, session, send_file
 from PIL import Image
 from fpdf import FPDF
+from datetime import datetime
 
 # --- Configuration ---
-# Suppress TensorFlow GPU messages
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-# Define image dimensions (must match the model's expected input)
 IMG_HEIGHT = 128
 IMG_WIDTH = 128
 
 # --- Flask App Initialization ---
 app = Flask(__name__)
-# A secret key is needed for session management
-app.config['SECRET_KEY'] = 'your_super_secret_key'
-# Define paths
+app.config['SECRET_KEY'] = 'a_new_even_more_secret_key'
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 MODEL_FOLDER = os.path.join(os.getcwd(), 'models')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Create upload folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- Model Loading ---
-# We load models once at startup to avoid slow loading on each request.
+# --- Model Dictionaries ---
+EXPECTED_MODELS = {
+    'Tumor Identification': 'tumor.h5',
+    'Alzheimer\'s Markers': 'alzheimer.h5',
+    'General Brain Segmentation': 'mri.h5'
+}
 MODELS = {}
 
+# --- Model Loading Function ---
 def load_all_models():
-    """Loads all .h5 models from the models directory into a global dictionary."""
-    print("--- Loading all models, this may take a moment... ---")
-    model_files = {
-        'tumor': 'tumor.h5',
-        'alzheimer': 'alzheimer.h5',
-        'mri_segmentation': 'mri.h5'
-    }
-    for model_name, file_name in model_files.items():
+    """Loads all available .h5 models from the models directory."""
+    print("--- Loading all available models, this may take a moment... ---")
+    for model_name, file_name in EXPECTED_MODELS.items():
         model_path = os.path.join(MODEL_FOLDER, file_name)
         if os.path.exists(model_path):
             try:
-                MODELS[model_name] = tf.keras.models.load_model(model_path)
+                # Use compile=False for faster loading during inference
+                MODELS[model_name] = tf.keras.models.load_model(model_path, compile=False)
                 print(f"✔️  Successfully loaded model: {model_name}")
             except Exception as e:
                 print(f"❌ Error loading model {model_name}: {e}")
         else:
-            print(f"⚠️  Warning: Model file not found at {model_path}")
+            print(f"⚠️  Warning: Model file not found for '{model_name}'. It will be skipped during analysis.")
     print("--- Model loading complete. ---")
 
 # --- Helper Functions ---
 def preprocess_image(image_path):
-    """Loads and preprocesses an image for model prediction."""
-    img = tf.keras.utils.load_img(image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
+    img = Image.open(image_path)
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    img = img.resize((IMG_WIDTH, IMG_HEIGHT))
     img_array = tf.keras.utils.img_to_array(img)
-    img_array /= 255.0  # Normalize to [0, 1]
-    img_batch = np.expand_dims(img_array, axis=0) # Add batch dimension
-    return img_batch, img # Return original PIL image for display
+    img_array /= 255.0
+    img_batch = np.expand_dims(img_array, axis=0)
+    return img_batch, img
 
 def encode_image_for_html(image):
-    """Encodes a PIL image or NumPy array into a base64 string for HTML display."""
     if isinstance(image, np.ndarray):
-        # Handle NumPy array (like the mask)
-        image = Image.fromarray((image * 255).astype(np.uint8).squeeze())
-
+        if image.size == 0:
+            image = Image.new('L', (IMG_WIDTH, IMG_HEIGHT), color=0)
+        else:
+            image = Image.fromarray((image * 255).astype(np.uint8).squeeze())
     buffered = io.BytesIO()
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 def get_text_interpretation(model_name, mask_array):
-    """
-    Generates a simple text interpretation based on the presence of segmented pixels.
-    *** YOU SHOULD CUSTOMIZE THE TEXT LOGIC AND CONTENT HERE ***
-    """
-    # Calculate the percentage of the mask that is "active" (white pixels)
     coverage = np.mean(mask_array > 0.5) * 100
-
-    if model_name == 'tumor':
-        if coverage > 0.1: # Threshold for detection
-            return (
-                "The model has identified a region of interest that may correspond to a tumor. "
-                "The highlighted area in the segmentation mask indicates the potential location. "
-                "This is a preliminary analysis and not a medical diagnosis."
-            )
+    report = {"status": "No Significant Findings", "summary": "", "details": "", "confidence": "Simulated: 90-95%"}
+    if model_name == 'Tumor Identification':
+        report["details"] = "This model is trained to identify anomalous tissue growths consistent with brain tumors."
+        if coverage > 0.1:
+            report["status"] = "Potential Anomaly Detected"
+            report["summary"] = f"The model has highlighted a region of interest covering approximately {coverage:.2f}% of the segmented brain area."
         else:
-            return "No significant regions of interest corresponding to a tumor were detected by the model."
-
-    elif model_name == 'alzheimer':
-        if coverage > 0.5: # Example threshold
-             return (
-                "The model has highlighted areas potentially associated with changes seen in Alzheimer's disease, "
-                "such as plaque concentration or hippocampal atrophy. "
-                "This is an analytical result for research purposes, not a clinical diagnosis."
-            )
+            report["summary"] = "The model did not identify any regions with significant characteristics of tumorous tissue."
+    elif model_name == 'Alzheimer\'s Markers':
+        report["details"] = "This model assesses biomarkers associated with Alzheimer's disease, such as hippocampal volume and cortical thickness."
+        if coverage > 0.5:
+            report["status"] = "Markers Consistent with AD Identified"
+            report["summary"] = f"The model has highlighted areas ({coverage:.2f}%) that may show volumetric changes or features sometimes associated with Alzheimer's."
         else:
-            return "The model did not detect significant markers associated with Alzheimer's disease in this scan."
-
-    elif model_name == 'mri_segmentation':
-        return (
-            "This is a general segmentation model that identifies different brain structures. "
-            "The output mask highlights the primary brain tissue region, separating it from the skull and background. "
-            "This is often a pre-processing step for further analysis."
-        )
-    return "No interpretation available for this model."
+            report["summary"] = "The model's analysis did not reveal significant biomarkers commonly linked to Alzheimer's disease."
+    elif model_name == 'General Brain Segmentation':
+        report["details"] = "This is a foundational model that isolates the primary brain matter from the skull and surrounding tissues."
+        report["status"] = "Analysis Complete"
+        report["summary"] = f"The model has successfully segmented the brain, isolating approximately {coverage:.2f}% of the image as brain tissue."
+    return report
 
 # --- PDF Generation Class ---
 class PDF(FPDF):
     def header(self):
-        self.set_font('Helvetica', 'B', 15)
-        self.cell(0, 10, 'AI Brain Scan Analysis Report', 0, 1, 'C')
-        self.ln(5)
-
+        self.set_font('Helvetica', 'B', 16)
+        self.cell(0, 10, 'AI-Powered Brain Scan Analysis Report', 0, 1, 'C')
+        self.set_font('Helvetica', '', 10)
+        self.cell(0, 8, f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 0, 1, 'C')
+        self.ln(10)
     def footer(self):
-        self.set_y(-15)
+        self.set_y(-20)
         self.set_font('Helvetica', 'I', 8)
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
-        self.cell(0, 10, 'Disclaimer: For informational purposes only. Not a medical diagnosis.', 0, 0, 'R')
-
-    def add_analysis_section(self, title, interpretation, original_img_path, mask_img):
-        self.add_page()
-        self.set_font('Helvetica', 'B', 12)
+        self.multi_cell(0, 5, 'Disclaimer: This report is generated by an automated AI system for informational purposes only. It is not a medical diagnosis and should not be used as a substitute for consultation with a qualified healthcare professional. All findings are preliminary and require review by a certified radiologist.', 0, 'C')
+        self.set_y(-10)
+        self.cell(0, 5, f'Page {self.page_no()}', 0, 0, 'C')
+    def chapter_title(self, title):
+        self.set_font('Helvetica', 'B', 14)
         self.cell(0, 10, title, 0, 1, 'L')
         self.ln(5)
-
-        self.set_font('Helvetica', '', 10)
-        self.multi_cell(0, 5, interpretation)
-        self.ln(10)
-        
-        # Save mask temporarily to be used in PDF
-        mask_pil = Image.fromarray((mask_img * 255).astype(np.uint8).squeeze())
-        temp_mask_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_mask.png')
-        mask_pil.save(temp_mask_path)
-        
-        # Add images side-by-side
-        self.image(original_img_path, x=20, w=80)
-        self.image(temp_mask_path, x=110, w=80)
-        self.set_font('Helvetica', 'I', 9)
-        self.text(50, self.get_y() + 85, 'Original Scan')
-        self.text(145, self.get_y() + 85, 'Model Output Mask')
-        os.remove(temp_mask_path) # Clean up temp file
+    def chapter_body(self, data, key_color=(0,0,0)):
+        self.set_font('Helvetica', '', 11)
+        for key, value in data.items():
+            self.set_font('Helvetica', 'B')
+            self.set_text_color(*key_color)
+            self.cell(40, 7, f"{key}:")
+            self.set_font('Helvetica', '')
+            self.set_text_color(0,0,0)
+            self.multi_cell(0, 7, value)
+        self.ln()
+    def add_analysis_section(self, title, report, original_img_path, mask_img):
+        self.add_page()
+        self.chapter_title(title)
+        if "Not Available" in report["status"]:
+            self.chapter_body({"Status": report["status"]}, key_color=(108, 117, 125))
+            self.chapter_body({"Summary": report["summary"]})
+        else:
+            status_color = (200, 0, 0) if "Detected" in report["status"] or "Identified" in report["status"] else (0, 100, 0)
+            self.chapter_body({"Status": report["status"], "AI Confidence": report["confidence"]}, key_color=status_color)
+            self.chapter_body({"Summary": report["summary"], "Model Details": report["details"]})
+            mask_pil = Image.fromarray((mask_img * 255).astype(np.uint8).squeeze())
+            temp_mask_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_mask.png')
+            mask_pil.save(temp_mask_path)
+            y_before_images = self.get_y()
+            self.image(original_img_path, x=20, w=80, y=y_before_images)
+            self.image(temp_mask_path, x=110, w=80, y=y_before_images)
+            self.set_y(y_before_images + 85)
+            self.set_font('Helvetica', 'I', 9)
+            self.cell(0, 5, 'Left: Original Scan  |  Right: AI Model Segmentation Mask', 0, 1, 'C')
+            os.remove(temp_mask_path)
 
 # --- Flask Routes ---
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
-    # Clear any previous results from the session
-    session.pop('results', None)
     return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    if 'file' not in request.files:
+    if 'file' not in request.files or request.files['file'].filename == '':
         return redirect(request.url)
+    
     file = request.files['file']
-    if file.filename == '':
-        return redirect(request.url)
-    
-    if file:
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filepath)
+    filename = file.filename
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
 
-        # Preprocess the uploaded image
+    try:
         processed_image, original_pil_img = preprocess_image(filepath)
-        
-        results = {}
-        # Run inference for each loaded model
-        for name, model in MODELS.items():
-            prediction = model.predict(processed_image)
-            mask = (prediction[0] > 0.5).astype(np.uint8) # Binarize the output mask
-            
-            results[name] = {
-                'mask_uri': encode_image_for_html(mask),
-                'interpretation': get_text_interpretation(name, mask),
-                'raw_mask': mask.tolist() # Store raw mask for PDF
-            }
-
-        # Store results in session for PDF generation
-        session['results'] = {
-            'original_img_uri': encode_image_for_html(original_pil_img),
-            'analysis': results,
-            'original_img_path': filepath
-        }
-        
-        return redirect(url_for('show_results'))
-
-@app.route('/results')
-def show_results():
-    results = session.get('results')
-    if not results:
+    except Exception as e:
+        print(f"[ERROR] Preprocessing failed: {e}")
         return redirect(url_for('index'))
-    return render_template('results.html', results=results)
 
-@app.route('/download_pdf')
-def download_pdf():
-    results = session.get('results')
-    if not results:
-        return redirect(url_for('index'))
+    results_data = {}
+    for name in EXPECTED_MODELS:
+        if name in MODELS:
+            try:
+                model = MODELS[name]
+                prediction = model.predict(processed_image)
+                mask = (prediction[0] > 0.5).astype(np.uint8)
+                results_data[name] = {'report': get_text_interpretation(name, mask), 'mask_uri': encode_image_for_html(mask)}
+            except Exception as e:
+                results_data[name] = {'report': {"status": "Analysis Failed", "summary": f"An error occurred: {e}", "details": "", "confidence": "N/A"}, 'mask_uri': encode_image_for_html(np.array([]))}
+        else:
+            results_data[name] = {'report': {"status": "Model Not Available", "summary": "Model could not be loaded.", "details": "This analysis was skipped.", "confidence": "N/A"}, 'mask_uri': encode_image_for_html(np.array([]))}
     
+    final_context = {
+        'original_img_uri': encode_image_for_html(original_pil_img),
+        'analysis': results_data
+    }
+    
+    return render_template('results.html', results=final_context, uploaded_filename=filename)
+
+@app.route('/download_pdf/<filename>')
+def download_pdf(filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    if not os.path.exists(filepath):
+        return redirect(url_for('index'))
+
+    try:
+        processed_image, _ = preprocess_image(filepath)
+    except Exception as e:
+        return redirect(url_for('index'))
+
     pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=True, margin=25)
 
-    # *** CUSTOMIZE THE PDF CONTENT HERE ***
-    for model_name, analysis_result in results['analysis'].items():
-        title = model_name.replace('_', ' ').title() + " Analysis"
-        interpretation = analysis_result['interpretation']
-        mask_array = np.array(analysis_result['raw_mask'])
+    for name in EXPECTED_MODELS:
+        mask_array = np.array([])
+        report_data = {}
+        if name in MODELS:
+            try:
+                model = MODELS[name]
+                prediction = model.predict(processed_image)
+                mask_array = (prediction[0] > 0.5).astype(np.uint8)
+                report_data = get_text_interpretation(name, mask_array)
+            except Exception as e:
+                report_data = {"status": "Analysis Failed", "summary": f"An error occurred: {e}"}
+        else:
+             report_data = {"status": "Model Not Available", "summary": "Model could not be loaded."}
         
-        pdf.add_analysis_section(
-            title,
-            interpretation,
-            results['original_img_path'],
-            mask_array
-        )
+        pdf.add_analysis_section(name, report_data, filepath, mask_array)
 
-    # Generate PDF in memory
     pdf_buffer = io.BytesIO(pdf.output())
     pdf_buffer.seek(0)
     
-    return send_file(
-        pdf_buffer,
-        as_attachment=True,
-        download_name='brain_scan_report.pdf',
-        mimetype='application/pdf'
-    )
+    return send_file(pdf_buffer, as_attachment=True, download_name='AI_Brain_Scan_Report.pdf', mimetype='application/pdf')
 
-# --- Main Execution ---
+#_#_#_#_# THIS IS THE CORRECTED PART #_#_#_#_#
+# Load the models when the application starts
+load_all_models()
+
+# This part is only for running with "python app.py"
 if __name__ == '__main__':
-    load_all_models() # Load models before starting the server
     app.run(debug=True)

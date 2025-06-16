@@ -3,60 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Brain Scan Analyzer</title>
+    <title>NeuroScan AI - Advanced Brain Scan Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>AI Brain Scan Analyzer</h1>
-            <p>Upload a brain scan image (JPG, PNG) to analyze it with our suite of deep learning models.</p>
-        </header>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">NeuroScan AI</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#analyzer" class="nav-link">Analyzer</a></li>
+                <li class="nav-item"><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+            </ul>
+        </div>
+    </nav>
 
-        <main>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Advanced Neurological Analysis</h1>
+            <p class="subtitle">Leveraging deep learning to provide preliminary insights from brain MRI scans. Upload your scan to begin.</p>
+            <a href="#analyzer" class="btn btn-primary">Get Started</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="analyzer" class="content-section">
+            <h2>Scan Analyzer</h2>
+            <p class="section-description">Upload a brain scan image (JPG or PNG) to receive an automated analysis from our suite of AI models.</p>
             <div id="upload-box">
                 <form id="upload-form" action="/analyze" method="post" enctype="multipart/form-data">
                     <input type="file" name="file" id="file-input" accept="image/png, image/jpeg" required>
                     <label for="file-input" class="file-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        <span>Choose an Image</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Select Brain Scan Image</span>
                     </label>
-                    <p id="file-name-display">No file selected</p>
-                    <button type="submit" class="btn">Analyze Scan</button>
+                    <p id="file-name-display">No file selected.</p>
+                    <button type="submit" class="btn btn-primary btn-submit">Begin Analysis</button>
                 </form>
             </div>
-            
             <div id="loading-state" class="hidden">
                 <div class="spinner"></div>
-                <p>Analyzing... This may take a moment.</p>
+                <p>Processing scan... Our AI is analyzing the image. This may take a moment.</p>
             </div>
-        </main>
+        </section>
 
-        <footer>
-            <p>Disclaimer: This tool is for informational purposes only and is not a substitute for professional medical advice.</p>
-        </footer>
-    </div>
+        <section id="how-it-works" class="content-section">
+            <h2>How It Works</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>1. Upload Scan</h3>
+                    <p>Select a 2D brain scan image from your device. Our system accepts common formats like JPG and PNG.</p>
+                </div>
+                <div class="info-card">
+                    <h3>2. AI Processing</h3>
+                    <p>Your image is pre-processed and analyzed by three distinct deep learning models, each trained for a specific task.</p>
+                </div>
+                <div class="info-card">
+                    <h3>3. View & Download</h3>
+                    <p>Review the visual results and AI-generated interpretations on the results page, then download a consolidated PDF report.</p>
+                </div>
+            </div>
+        </section>
 
-    <script>
-        const form = document.getElementById('upload-form');
-        const fileInput = document.getElementById('file-input');
-        const fileNameDisplay = document.getElementById('file-name-display');
-        const uploadBox = document.getElementById('upload-box');
-        const loadingState = document.getElementById('loading-state');
+        <section id="about" class="content-section">
+            <h2>About The Technology</h2>
+            <p class="section-description">This platform utilizes U-Net based convolutional neural networks (CNNs), a state-of-the-art architecture for biomedical image segmentation. Each model has been trained on a curated dataset to recognize specific patterns and features within brain MRI scans.</p>
+            <!-- You can add more details about each model here -->
+        </section>
+    </main>
 
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                fileNameDisplay.textContent = fileInput.files[0].name;
-            } else {
-                fileNameDisplay.textContent = 'No file selected';
-            }
-        });
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="disclaimer"><strong>Important Disclaimer:</strong> NeuroScan AI is an experimental tool for informational and academic purposes only. It is not a medical device, and its output does not constitute a medical diagnosis. Always consult a qualified healthcare professional for any health concerns.</p>
+            <p>&copy; 2025 NeuroScan AI. All Rights Reserved.</p>
+        </div>
+    </footer>
 
-        form.addEventListener('submit', () => {
-            uploadBox.classList.add('hidden');
-            loadingState.classList.remove('hidden');
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

@@ -3,47 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Results</title>
+    <title>Analysis Report - NeuroScan AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Analysis Results</h1>
-            <p>The following are the outputs from our AI models for your uploaded scan.</p>
-        </header>
-
-        <div class="results-actions">
-            <a href="{{ url_for('download_pdf') }}" class="btn">Download PDF Report</a>
-            <a href="{{ url_for('index') }}" class="btn-secondary">Analyze Another Scan</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">NeuroScan AI</a>
         </div>
-
-        <div class="results-grid">
-            {% for name, data in results.analysis.items() %}
-            <div class="result-card">
-                <h2>{{ name.replace('_', ' ').title() }}</h2>
-                <div class="image-comparison">
-                    <div class="image-container">
-                        <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
-                        <p class="caption">Original Scan</p>
+    </nav>
+    
+    <main class="container">
+        <section class="content-section">
+            <header class="results-header">
+                <h1>Analysis Report</h1>
+                <p class="section-description">This report summarizes the findings from our suite of AI models. For a detailed breakdown, download the PDF report.</p>
+                <div class="results-actions">
+                    <!-- THIS IS THE CORRECTED LINE -->
+                    <a href="{{ url_for('download_pdf', filename=uploaded_filename) }}" class="btn btn-primary">Download Full PDF Report</a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Analyze Another Scan</a>
+                </div>
+            </header>
+            
+            <div class="results-grid">
+                {% for name, data in results.analysis.items() %}
+                <div class="result-card">
+                    <h2 class="result-card-title">{{ name }}</h2>
+                    <div class="image-comparison">
+                        <div class="image-container">
+                            <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
+                            <p class="caption">Original Scan</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="data:image/png;base64,{{ data.mask_uri }}" alt="{{ name }} Mask">
+                            <p class="caption">AI Segmentation Mask</p>
+                        </div>
                     </div>
-                    <div class="image-container">
-                        <img src="data:image/png;base64,{{ data.mask_uri }}" alt="{{ name }} Mask">
-                        <p class="caption">Model Output Mask</p>
+                    <div class="interpretation">
+                        <div class="report-item status-{{ data.report.status.split(' ')[0] | lower }}">
+                            <strong>Status:</strong> {{ data.report.status }}
+                        </div>
+                        <div class="report-item">
+                            <strong>Summary:</strong> {{ data.report.summary }}
+                        </div>
+                        <div class="report-item">
+                            <strong>Model Details:</strong> {{ data.report.details }}
+                        </div>
+                         <div class="report-item">
+                            <strong>AI Confidence (Simulated):</strong> {{ data.report.confidence }}
+                        </div>
                     </div>
                 </div>
-                <div class="interpretation">
-                    <h3>Interpretation</h3>
-                    <p>{{ data.interpretation }}</p>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="disclaimer"><strong>Important Disclaimer:</strong> NeuroScan AI is an experimental tool for informational and academic purposes only. It is not a medical device, and its output does not constitute a medical diagnosis. Always consult a qualified healthcare professional for any health concerns.</p>
+            <p>&copy; 2025 NeuroScan AI. All Rights Reserved.</p>
         </div>
-
-        <footer>
-            <p>Disclaimer: This tool is for informational purposes only and is not a substitute for professional medical advice.</p>
-        </footer>
-    </div>
+    </footer>
 </body>
 </html>
