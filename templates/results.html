@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Analysis Results</h1>
+            <p>The following are the outputs from our AI models for your uploaded scan.</p>
+        </header>
+
+        <div class="results-actions">
+            <a href="{{ url_for('download_pdf') }}" class="btn">Download PDF Report</a>
+            <a href="{{ url_for('index') }}" class="btn-secondary">Analyze Another Scan</a>
+        </div>
+
+        <div class="results-grid">
+            {% for name, data in results.analysis.items() %}
+            <div class="result-card">
+                <h2>{{ name.replace('_', ' ').title() }}</h2>
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
+                        <p class="caption">Original Scan</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="data:image/png;base64,{{ data.mask_uri }}" alt="{{ name }} Mask">
+                        <p class="caption">Model Output Mask</p>
+                    </div>
+                </div>
+                <div class="interpretation">
+                    <h3>Interpretation</h3>
+                    <p>{{ data.interpretation }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer>
+            <p>Disclaimer: This tool is for informational purposes only and is not a substitute for professional medical advice.</p>
+        </footer>
+    </div>
+</body>
+</html>
