@@ -31,6 +31,9 @@
                 {% for name, data in results.analysis.items() %}
                 <div class="result-card">
                     <h2 class="result-card-title">{{ name }}</h2>
+                    
+                    <!-- Conditional Block for Model Type -->
+                    {% if data.report.type == 'segmentation' %}
                     <div class="image-comparison">
                         <div class="image-container">
                             <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
@@ -41,20 +44,32 @@
                             <p class="caption">AI Segmentation Mask</p>
                         </div>
                     </div>
+
+                    {% elif data.report.type == 'classification' %}
+                    <div class="classification-display">
+                         <div class="image-container single">
+                            <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
+                            <p class="caption">Input Scan for Classification</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- End Conditional Block -->
+
                     <div class="interpretation">
                         <div class="report-item status-{{ data.report.status.split(' ')[0] | lower }}">
                             <strong>Status:</strong> {{ data.report.status }}
                         </div>
                         <div class="report-item">
-                            <!-- ADDING THE |safe FILTER HERE TO RENDER BOLD TEXT -->
                             <strong>Summary:</strong> {{ data.report.summary | safe }}
                         </div>
                         <div class="report-item">
                             <strong>Model Details:</strong> {{ data.report.details }}
                         </div>
+                        {% if data.report.confidence %}
                          <div class="report-item">
-                            <strong>AI Confidence (Simulated):</strong> {{ data.report.confidence }}
+                            <strong>AI Confidence:</strong> {{ data.report.confidence }}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -64,7 +79,7 @@
     
     <footer class="footer">
         <div class="footer-container">
-            <p class="disclaimer"><strong>Important Disclaimer:</strong> NeuroScan AI is an experimental tool for informational and academic purposes only. It is not a medical device, and its output does not constitute a medical diagnosis. Always consult a qualified healthcare professional for any health concerns.</p>
+            <p class="disclaimer"><strong>Important Disclaimer:</strong> This tool is for informational purposes only and is not a substitute for professional medical advice.</p>
             <p>&copy; 2025 NeuroScan AI. All Rights Reserved.</p>
         </div>
     </footer>

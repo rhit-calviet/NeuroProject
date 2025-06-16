@@ -1,12 +1,13 @@
 :root {
-    --primary-color: #1a73e8;
-    --secondary-color: #5f6368;
-    --background-color: #f1f3f4;
+    --primary-color: #005f73; /* Dark Teal */
+    --secondary-color: #495057; /* Dark Gray */
+    --background-color: #f8f9fa; /* Off-white */
     --surface-color: #ffffff;
-    --text-color: #202124;
-    --border-color: #dadce0;
+    --text-color: #212529; /* Near Black */
+    --border-color: #dee2e6;
+    --accent-color: #0a9396; /* Brighter Teal for accents */
     --font-family: 'Inter', sans-serif;
-    --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px 1px rgba(0,0,0,0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -61,11 +62,11 @@ body {
     font-weight: 600;
     transition: color 0.3s ease;
 }
-.nav-link:hover { color: var(--primary-color); }
+.nav-link:hover { color: var(--accent-color); }
 
 /* --- Hero Section --- */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://placehold.co/1600x600/1e2c3a/ffffff?text=Abstract+Neural+Network') center/cover no-repeat;
+    background: linear-gradient(rgba(10, 25, 47, 0.7), rgba(10, 25, 47, 0.7)), url('https://placehold.co/1600x600/0a192f/ffffff?text=NeuroScan+AI') center/cover no-repeat;
     color: white;
     text-align: center;
     padding: 6rem 2rem;
@@ -87,11 +88,11 @@ body {
     border: 2px solid transparent;
 }
 .btn-primary {
-    background-color: var(--primary-color);
+    background-color: var(--accent-color);
     color: white;
 }
 .btn-primary:hover {
-    background-color: #185abc;
+    background-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -101,7 +102,7 @@ body {
     border-color: var(--border-color);
 }
 .btn-secondary:hover {
-    background-color: #e8f0fe;
+    background-color: #e9ecef;
     border-color: var(--primary-color);
 }
 .btn-submit {
@@ -148,7 +149,7 @@ body {
 }
 .file-label:hover {
     background-color: #f8f9fa;
-    border-color: var(--primary-color);
+    border-color: var(--accent-color);
 }
 #file-input { display: none; }
 #file-name-display { color: var(--secondary-color); font-style: italic; margin-top: 1rem; }
@@ -178,7 +179,7 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-/* --- NEW: Contact Section --- */
+/* --- Contact Section --- */
 .contact-grid {
     display: flex;
     justify-content: center;
@@ -226,7 +227,7 @@ body {
     transition: color 0.3s ease, transform 0.3s ease;
 }
 .contact-socials a:hover {
-    color: var(--primary-color);
+    color: var(--accent-color);
     transform: scale(1.2);
 }
 
@@ -289,6 +290,17 @@ body {
 }
 .report-item:last-child { border-bottom: none; margin-bottom: 0; }
 .report-item strong { color: var(--text-color); }
-.status-potential, .status-markers { color: #d93025; font-weight: 700; }
+.status-potential, .status-markers, .status-flair, .status-classification { color: #d93025; font-weight: 700; }
 .status-no { color: #1e8e3e; font-weight: 700; }
-.status-analysis { color: var(--primary-color); font-weight: 700; }
+.status-analysis { color: var(--accent-color); font-weight: 700; }
+
+/* --- NEW STYLES FOR CLASSIFICATION --- */
+.classification-display {
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+.image-container.single {
+    max-width: 50%;
+    margin: 0 auto;
+}
+
