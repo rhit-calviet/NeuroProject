@@ -6,6 +6,8 @@
     --text-color: #212529; /* Near Black */
     --border-color: #dee2e6;
     --accent-color: #0a9396; /* Brighter Teal for accents */
+    --positive-color: #d93025; /* Red for positive findings */
+    --negative-color: #1e8e3e; /* Green for negative findings */
     --font-family: 'Inter', sans-serif;
     --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px 1px rgba(0,0,0,0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -127,14 +129,34 @@ body {
     color: var(--secondary-color);
 }
 
-/* --- Upload Box --- */
+/* --- Upload Box & Form --- */
 #upload-box {
     background-color: var(--surface-color);
     padding: 3rem;
     border-radius: 12px;
     box-shadow: var(--shadow-sm);
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-size: 1rem;
 }
 .file-label {
     display: flex;
@@ -180,127 +202,39 @@ body {
 }
 
 /* --- Contact Section --- */
-.contact-grid {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    flex-wrap: wrap;
-}
-.contact-card {
-    background-color: var(--surface-color);
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    text-align: center;
-    width: 300px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.contact-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-}
-.contact-photo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--primary-color);
-    margin-bottom: 1rem;
-    object-fit: cover;
-}
-.contact-name {
-    margin: 0.5rem 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-.contact-role {
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
-}
-.contact-socials {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-}
-.contact-socials a {
-    color: var(--secondary-color);
-    font-size: 1.5rem;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-.contact-socials a:hover {
-    color: var(--accent-color);
-    transform: scale(1.2);
-}
-
+.contact-grid { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; }
+.contact-card { background-color: var(--surface-color); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow-md); text-align: center; width: 300px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.contact-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+.contact-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem; object-fit: cover; }
+.contact-name { margin: 0.5rem 0; font-size: 1.25rem; font-weight: 600; }
+.contact-role { color: var(--secondary-color); margin-bottom: 1.5rem; }
+.contact-socials { display: flex; justify-content: center; gap: 1.5rem; }
+.contact-socials a { color: var(--secondary-color); font-size: 1.5rem; transition: color 0.3s ease, transform 0.3s ease; }
+.contact-socials a:hover { color: var(--accent-color); transform: scale(1.2); }
 
 /* --- Footer --- */
-.footer {
-    background-color: #e9ecef;
-    padding: 2rem;
-    text-align: center;
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-}
-.footer-container {
-    max-width: 800px;
-    margin: auto;
-}
-.footer .disclaimer {
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-}
+.footer { background-color: #e9ecef; padding: 2rem; text-align: center; color: var(--secondary-color); font-size: 0.9rem; }
+.footer-container { max-width: 800px; margin: auto; }
+.footer .disclaimer { font-size: 0.8rem; margin-bottom: 1rem; }
 
 /* --- Results Page --- */
 .results-header { margin-bottom: 3rem; }
 .results-actions { display: flex; justify-content: center; gap: 1rem; }
 .results-grid { display: grid; gap: 2.5rem; }
-.result-card {
-    background-color: var(--surface-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-}
-.result-card-title {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 1rem 2rem;
-    margin: 0;
-    font-size: 1.25rem;
-}
-.image-comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    align-items: center;
-}
+.result-card { background-color: var(--surface-color); border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; }
+.result-card-title { background-color: var(--primary-color); color: white; padding: 1rem 2rem; margin: 0; font-size: 1.25rem; }
+.image-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; background-color: #f8f9fa; align-items: center; }
 .image-container { text-align: center; }
-.image-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
-}
+.image-container img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm); }
 .image-container .caption { margin-top: 0.5rem; font-style: italic; color: var(--secondary-color); }
 .interpretation { padding: 2rem; }
-.report-item {
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
+.report-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
 .report-item:last-child { border-bottom: none; margin-bottom: 0; }
 .report-item strong { color: var(--text-color); }
-.status-potential, .status-markers, .status-flair, .status-classification { color: #d93025; font-weight: 700; }
-.status-no { color: #1e8e3e; font-weight: 700; }
-.status-analysis { color: var(--accent-color); font-weight: 700; }
 
-/* --- NEW STYLES FOR CLASSIFICATION --- */
-.classification-display {
-    padding: 2rem;
-    background-color: #f8f9fa;
-}
-.image-container.single {
-    max-width: 50%;
-    margin: 0 auto;
-}
+/* --- NEW STATUS COLORS --- */
+.status-positive { color: var(--positive-color); font-weight: 700; }
+.status-negative { color: var(--negative-color); font-weight: 700; }
 
+.classification-display { padding: 2rem; background-color: #f8f9fa; }
+.image-container.single { max-width: 50%; margin: 0 auto; }

@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for social icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -28,11 +27,6 @@
     <header class="hero">
         <div class="hero-content">
             <h1>Advanced Neurological Analysis</h1>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
             <p class="subtitle">Leveraging deep learning to provide preliminary insights from brain MRI scans. Upload your scan to begin.</p>
             <a href="#analyzer" class="btn btn-primary">Get Started</a>
         </div>
@@ -41,9 +35,31 @@
     <main class="container">
         <section id="analyzer" class="content-section">
             <h2>Scan Analyzer</h2>
-            <p class="section-description">Upload a brain scan image (JPG or PNG) to receive an automated analysis from our suite of AI models.</p>
+            <p class="section-description">Upload a brain scan image and provide the patient's information to receive an automated analysis from our suite of AI models.</p>
             <div id="upload-box">
                 <form id="upload-form" action="/analyze" method="post" enctype="multipart/form-data">
+                    
+                    <!-- NEW PATIENT INFO FIELDS -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="patient_name">Patient Name</label>
+                            <input type="text" id="patient_name" name="patient_name" placeholder="e.g., John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient_age">Age</label>
+                            <input type="number" id="patient_age" name="patient_age" placeholder="e.g., 58" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient_sex">Sex</label>
+                            <select id="patient_sex" name="patient_sex" required>
+                                <option value="" disabled selected>Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <input type="file" name="file" id="file-input" accept="image/png, image/jpeg" required>
                     <label for="file-input" class="file-label">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -64,50 +80,45 @@
             <div class="info-grid">
                 <div class="info-card">
                     <h3>1. Upload Scan</h3>
-                    <p>Select a 2D brain scan image from your device. Our system accepts common formats like JPG and PNG.</p>
+                    <p>Enter patient details and select a 2D brain scan image from your device. Our system accepts JPG and PNG formats.</p>
                 </div>
                 <div class="info-card">
                     <h3>2. AI Processing</h3>
-                    <p>Your image is pre-processed and analyzed by three distinct deep learning models, each trained for a specific task.</p>
+                    <p>Your image is pre-processed and analyzed by distinct deep learning models, each trained for a specific task.</p>
                 </div>
                 <div class="info-card">
                     <h3>3. View & Download</h3>
-                    <p>Review the visual results and AI-generated interpretations on the results page, then download a consolidated PDF report.</p>
+                    <p>Review the concise results on the web, then download a comprehensive, multi-page PDF report for detailed analysis.</p>
                 </div>
             </div>
         </section>
 
         <section id="about" class="content-section">
             <h2>About The Technology</h2>
-            <p class="section-description">This platform utilizes U-Net based convolutional neural networks (CNNs), a state-of-the-art architecture for biomedical image segmentation. Each model has been trained on a curated dataset to recognize specific patterns and features within brain MRI scans.</p>
+            <p class="section-description">This platform utilizes U-Net and other CNN architectures for biomedical image analysis. Each model has been trained on a curated dataset to recognize specific patterns and features within brain MRI scans.</p>
         </section>
 
-        <!-- CONTACT SECTION WITH CORRECTED IMAGE PATHS -->
         <section id="contact" class="content-section">
             <h2>Meet The Team</h2>
             <p class="section-description">This project was developed by a passionate team dedicated to exploring the intersection of AI and healthcare.</p>
             <div class="contact-grid">
-                <!-- Contact Card 1 -->
                 <div class="contact-card">
-                    <!-- FIX: Use url_for() to generate the correct path -->
                     <img src="{{ url_for('static', filename='images/matteo_profile.jpeg') }}" alt="Matteo Calviello" class="contact-photo">
                     <h3 class="contact-name">Matteo Calviello</h3>
-                    <p class="contact-role">Data Scientist</p>
+                    <p class="contact-role">Lead Data Scientist</p>
                     <div class="contact-socials">
-                        <a href="https://www.linkedin.com/in/matteo-calviello/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://github.com/rhit-calviem" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/matteo-calviello/" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/rhit-calviem" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
                         <a href="mailto:mattecalviello04@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
-                <!-- Contact Card 2 -->
                 <div class="contact-card">
-                    <!-- FIX: Use url_for() to generate the correct path -->
                     <img src="{{ url_for('static', filename='images/tommaso_profile.jpeg') }}" alt="Tommaso Calviello" class="contact-photo">
                     <h3 class="contact-name">Tommaso Calviello</h3>
                     <p class="contact-role">Project Manager</p>
                     <div class="contact-socials">
-                        <a href="https://www.linkedin.com/in/tommaso-calviello/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://github.com/rhit-calviet" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/tommaso-calviello/" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/rhit-calviet" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
                         <a href="mailto:partner.email@example.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
