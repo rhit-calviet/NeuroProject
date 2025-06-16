@@ -22,7 +22,6 @@
                 <h1>Analysis Report</h1>
                 <p class="section-description">This report summarizes the findings from our suite of AI models. For a detailed breakdown, download the PDF report.</p>
                 <div class="results-actions">
-                    <!-- THIS IS THE CORRECTED LINE -->
                     <a href="{{ url_for('download_pdf', filename=uploaded_filename) }}" class="btn btn-primary">Download Full PDF Report</a>
                     <a href="{{ url_for('index') }}" class="btn btn-secondary">Analyze Another Scan</a>
                 </div>
@@ -47,7 +46,8 @@
                             <strong>Status:</strong> {{ data.report.status }}
                         </div>
                         <div class="report-item">
-                            <strong>Summary:</strong> {{ data.report.summary }}
+                            <!-- ADDING THE |safe FILTER HERE TO RENDER BOLD TEXT -->
+                            <strong>Summary:</strong> {{ data.report.summary | safe }}
                         </div>
                         <div class="report-item">
                             <strong>Model Details:</strong> {{ data.report.details }}

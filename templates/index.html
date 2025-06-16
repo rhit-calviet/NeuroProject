@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroScan AI - Advanced Brain Scan Analysis</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
@@ -17,6 +20,7 @@
                 <li class="nav-item"><a href="#analyzer" class="nav-link">Analyzer</a></li>
                 <li class="nav-item"><a href="#how-it-works" class="nav-link">How It Works</a></li>
                 <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -24,6 +28,10 @@
     <header class="hero">
         <div class="hero-content">
             <h1>Advanced Neurological Analysis</h1>
+            <br>
+            <br>
+            <br>
+            <br>
             <p class="subtitle">Leveraging deep learning to provide preliminary insights from brain MRI scans. Upload your scan to begin.</p>
             <a href="#analyzer" class="btn btn-primary">Get Started</a>
         </div>
@@ -71,7 +79,38 @@
         <section id="about" class="content-section">
             <h2>About The Technology</h2>
             <p class="section-description">This platform utilizes U-Net based convolutional neural networks (CNNs), a state-of-the-art architecture for biomedical image segmentation. Each model has been trained on a curated dataset to recognize specific patterns and features within brain MRI scans.</p>
-            <!-- You can add more details about each model here -->
+        </section>
+
+        <!-- CONTACT SECTION WITH CORRECTED IMAGE PATHS -->
+        <section id="contact" class="content-section">
+            <h2>Meet The Team</h2>
+            <p class="section-description">This project was developed by a passionate team dedicated to exploring the intersection of AI and healthcare.</p>
+            <div class="contact-grid">
+                <!-- Contact Card 1 -->
+                <div class="contact-card">
+                    <!-- FIX: Use url_for() to generate the correct path -->
+                    <img src="{{ url_for('static', filename='images/matteo_profile.jpeg') }}" alt="Matteo Calviello" class="contact-photo">
+                    <h3 class="contact-name">Matteo Calviello</h3>
+                    <p class="contact-role">Data Scientist</p>
+                    <div class="contact-socials">
+                        <a href="https://www.linkedin.com/in/matteo-calviello/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/rhit-calviem" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="mailto:mattecalviello04@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <!-- Contact Card 2 -->
+                <div class="contact-card">
+                    <!-- FIX: Use url_for() to generate the correct path -->
+                    <img src="{{ url_for('static', filename='images/tommaso_profile.jpeg') }}" alt="Tommaso Calviello" class="contact-photo">
+                    <h3 class="contact-name">Tommaso Calviello</h3>
+                    <p class="contact-role">Project Manager</p>
+                    <div class="contact-socials">
+                        <a href="https://www.linkedin.com/in/tommaso-calviello/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/rhit-calviet" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="mailto:partner.email@example.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
