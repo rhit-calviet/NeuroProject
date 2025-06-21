@@ -7,6 +7,7 @@ from flask import Flask, request, render_template, redirect, url_for, send_file
 from PIL import Image
 from fpdf import FPDF
 from datetime import datetime
+from dicom_utils import convert_dicom_to_jpg # <--- IMPORT THE NEW FUNCTION
 
 # --- Configuration ---
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -184,7 +185,8 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    if 'file' not in request.files or request.files['file'].filename == '': return redirect(request.url)
+    if 'file' not in request.files or request.files['file'].filename == '':
+        return redirect(request.url)
     
     patient_info = {
         "Name": request.form.get('patient_name'),
@@ -192,28 +194,64 @@ def analyze():
         "Sex": request.form.get('patient_sex')
     }
 
-    file = request.files['file']; filename = file.filename
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename); file.save(filepath)
-    original_pil_img = Image.open(filepath).convert("RGB")
+    file = request.files['file']
+    filename = file.filename
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+
+    # --- MODIFICATION START: DICOM file handling ---
+    analysis_filepath = filepath
+    if filename.lower().endswith('.dcm'):
+        try:
+            # If it's a DICOM, convert it to JPG and use the new path for analysis
+            analysis_filepath = convert_dicom_to_jpg(filepath, app.config['UPLOAD_FOLDER'])
+        except Exception as e:
+            # If conversion fails, show an error on the results page
+            error_context = {
+                'analysis': {
+                    'DICOM Conversion Error': {
+                        'report': {
+                            "status": "DICOM Processing Failed",
+                            "summary": f"The uploaded DICOM file could not be processed. Error: {e}",
+                            "type": "error",
+                            "confidence": "N/A"
+                        },
+                        'mask_uri': None
+                    }
+                },
+                'patient_info': patient_info,
+                'original_img_uri': None
+            }
+            return render_template('results.html', results=error_context, uploaded_filename=filename)
+    # --- MODIFICATION END ---
+    
+    # Use the (potentially new) path and filename for the rest of the process
+    analysis_filename = os.path.basename(analysis_filepath)
+    original_pil_img = Image.open(analysis_filepath).convert("RGB")
     display_img_resized = original_pil_img.resize((SEGMENTATION_IMG_SIZE, SEGMENTATION_IMG_SIZE))
 
     results_data = {}
     for name, model_info in EXPECTED_MODELS.items():
         if name in MODELS:
             try:
-                model = MODELS[name]; model_type = model_info['type']
+                model = MODELS[name]
+                model_type = model_info['type']
+                # Ensure all preprocessing functions use the 'analysis_filepath'
                 if model_type == 'segmentation':
-                    processed_image, _ = preprocess_for_segmentation(filepath)
-                    prediction = model.predict(processed_image); report = get_segmentation_interpretation(name, prediction[0])
+                    processed_image, _ = preprocess_for_segmentation(analysis_filepath)
+                    prediction = model.predict(processed_image)
+                    report = get_segmentation_interpretation(name, prediction[0])
                     mask_for_display = (prediction[0] > 0.5).astype(np.uint8)
                     results_data[name] = {'report': report, 'mask_uri': encode_image_for_html(mask_for_display)}
                 elif model_type == 'classification_alzheimer':
-                    processed_image, _ = preprocess_for_alzheimer(filepath)
-                    prediction = model.predict(processed_image); report = get_classification_interpretation(name, model_type, prediction[0])
+                    processed_image, _ = preprocess_for_alzheimer(analysis_filepath)
+                    prediction = model.predict(processed_image)
+                    report = get_classification_interpretation(name, model_type, prediction[0])
                     results_data[name] = {'report': report, 'mask_uri': None}
                 elif model_type == 'classification_tumor':
-                    processed_image, _ = preprocess_for_tumor(filepath)
-                    prediction = model.predict(processed_image); report = get_classification_interpretation(name, model_type, prediction[0])
+                    processed_image, _ = preprocess_for_tumor(analysis_filepath)
+                    prediction = model.predict(processed_image)
+                    report = get_classification_interpretation(name, model_type, prediction[0])
                     results_data[name] = {'report': report, 'mask_uri': None}
             except Exception as e:
                 results_data[name] = {'report': {"status": "Analysis Failed", "summary": f"An error occurred: {e}", "type": "error"}, 'mask_uri': None}
@@ -221,12 +259,19 @@ def analyze():
             results_data[name] = {'report': {"status": "Model Not Available", "summary": "Model could not be loaded.", "type": "unavailable"}, 'mask_uri': None}
     
     final_context = {'original_img_uri': encode_image_for_html(display_img_resized), 'analysis': results_data, 'patient_info': patient_info}
-    return render_template('results.html', results=final_context, uploaded_filename=filename)
+    # Pass the filename of the analyzed image (the JPG) to the template
+    return render_template('results.html', results=final_context, uploaded_filename=analysis_filename)
+
 
 @app.route('/download_pdf/<filename>')
 def download_pdf(filename):
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if not os.path.exists(filepath): return redirect(url_for('index'))
+    if not os.path.exists(filepath):
+        return redirect(url_for('index'))
+    
+    # NOTE: No changes are needed here. The filename received will be for the
+    # JPG file created from the DICOM, and the analysis will be correctly
+    # re-run on that JPG.
     
     patient_info = {
         "Name": request.args.get('name', 'N/A'),
@@ -234,30 +279,36 @@ def download_pdf(filename):
         "Sex": request.args.get('sex', 'N/A')
     }
 
-    pdf = PDF(); pdf.add_patient_info(patient_info)
+    pdf = PDF()
+    pdf.add_patient_info(patient_info)
     for name, model_info in EXPECTED_MODELS.items():
         if name in MODELS:
             try:
-                model = MODELS[name]; model_type = model_info['type']
+                model = MODELS[name]
+                model_type = model_info['type']
                 if model_type == 'segmentation':
                     processed_image, _ = preprocess_for_segmentation(filepath)
-                    prediction = model.predict(processed_image); report = get_segmentation_interpretation(name, prediction[0])
+                    prediction = model.predict(processed_image)
+                    report = get_segmentation_interpretation(name, prediction[0])
                     mask_array = (prediction[0] > 0.5).astype(np.uint8)
                     pdf.add_analysis_section(name, report, filepath, mask_array)
                 elif model_type == 'classification_alzheimer':
                     processed_image, _ = preprocess_for_alzheimer(filepath)
-                    prediction = model.predict(processed_image); report = get_classification_interpretation(name, model_type, prediction[0])
+                    prediction = model.predict(processed_image)
+                    report = get_classification_interpretation(name, model_type, prediction[0])
                     pdf.add_analysis_section(name, report, filepath)
                 elif model_type == 'classification_tumor':
                     processed_image, _ = preprocess_for_tumor(filepath)
-                    prediction = model.predict(processed_image); report = get_classification_interpretation(name, model_type, prediction[0])
+                    prediction = model.predict(processed_image)
+                    report = get_classification_interpretation(name, model_type, prediction[0])
                     pdf.add_analysis_section(name, report, filepath)
             except Exception as e:
                 pdf.add_analysis_section(name, {"status": "Analysis Failed", "summary": f"An error occurred: {e}", "type": "error"}, filepath)
         else:
             pdf.add_analysis_section(name, {"status": "Model Not Available", "summary": "Model could not be loaded.", "type": "unavailable"}, filepath)
     
-    pdf_buffer = io.BytesIO(pdf.output()); pdf_buffer.seek(0)
+    pdf_buffer = io.BytesIO(pdf.output())
+    pdf_buffer.seek(0)
     return send_file(pdf_buffer, as_attachment=True, download_name='AI_Brain_Scan_Report.pdf', mimetype='application/pdf')
 
 load_all_models()
