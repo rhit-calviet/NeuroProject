@@ -23,7 +23,6 @@
                 <h1>Analysis Report</h1>
                 <p class="section-description">This report summarizes the findings from our suite of AI models. For a detailed breakdown, download the PDF report.</p>
                 <div class="results-actions">
-                    <!-- UPDATED PDF LINK TO INCLUDE PATIENT INFO -->
                     <a href="{{ url_for('download_pdf', filename=uploaded_filename, name=results.patient_info.Name, age=results.patient_info.Age, sex=results.patient_info.Sex) }}" class="btn btn-primary">Download Full PDF Report</a>
                     <a href="{{ url_for('index') }}" class="btn btn-secondary">Analyze Another Scan</a>
                 </div>
@@ -45,6 +44,17 @@
                             <p class="caption">AI Segmentation Mask</p>
                         </div>
                     </div>
+                    {% elif data.report.type == 'classification' and data.gradcam_uri %}
+                    <div class="image-comparison">
+                        <div class="image-container">
+                            <img src="data:image/png;base64,{{ results.original_img_uri }}" alt="Original Scan">
+                            <p class="caption">Original Scan</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="data:image/png;base64,{{ data.gradcam_uri }}" alt="{{ name }} Grad-CAM">
+                            <p class="caption">AI Attention (Grad-CAM)</p>
+                        </div>
+                    </div>
                     {% elif data.report.type == 'classification' %}
                     <div class="classification-display">
                          <div class="image-container single">
@@ -55,13 +65,11 @@
                     {% endif %}
 
                     <div class="interpretation">
-                        <!-- LOGIC FOR COLOR-CODING -->
                         {% set is_positive = 'Detected' in data.report.status or 'Demented' in data.report.get('predicted_class', '') or ('T1' in data.report.get('predicted_class', '') or 'T2' in data.report.get('predicted_class', '')) and 'NORMAL' not in data.report.get('predicted_class', '') %}
                         <div class="report-item status-{{ 'positive' if is_positive else 'negative' }}">
                             <strong>Status:</strong> {{ data.report.status }}
                         </div>
                         <div class="report-item">
-                            <!-- FIX: Added the |safe filter to render HTML bold tags -->
                             <strong>Summary:</strong> {{ data.report.summary | safe }}
                         </div>
                          <div class="report-item">

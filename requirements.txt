@@ -3,3 +3,5 @@ tensorflow
 numpy
 Pillow
 fpdf2
+pydicom
+opencv-python-headless
