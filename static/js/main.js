@@ -44,15 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Tumor Type Classification Model",
             description: "This model is a custom-built Convolutional Neural Network (CNN). The architecture consists of three convolutional layers with increasing filter sizes (32, 64, 128) followed by MaxPooling layers to extract key features from the images. A Dropout layer is included to prevent overfitting before the final Dense layers classify the scan into one of 15 consolidated tumor types, including a 'Normal' category.",
             performance: "The model was trained on the 'Brain Tumor MRI Images' dataset, which was split into training, validation, and test sets. To improve robustness, the training data was enhanced with data augmentation techniques, including random rotations, shifts, shears, and zooms. Performance was tracked by monitoring accuracy and loss on the validation set during training.",
-            img1: "../static/images/confusion_matrix_tumor.png",
-            img2: "../static/images/training_plot_tumor.png"
+            img1: "../static/images/training_plot_tumor.png",
+            img2: "../static/images/confusion_matrix_tumor.png"
         },
         alzheimer: {
             title: "Alzheimer's Stage Classification Model",
             description: "This model utilizes transfer learning based on the VGG16 architecture, pre-trained on the ImageNet dataset. The original convolutional base is used as a feature extractor, with its initial layers frozen. A custom classification head—consisting of Dense, Batch Normalization, and Dropout layers—was added and trained on the Alzheimer's MRI dataset. For fine-tuning, the final three convolutional layers of the VGG16 base were unfrozen to adapt more closely to the specific features of MRI scans.",
             performance: "The model was trained on the 'Augmented Alzheimer MRI Dataset', which categorizes scans into four stages of the disease. The model's learning rate was adjusted dynamically using a ReduceLROnPlateau callback, and EarlyStopping was used to prevent overfitting. Performance is evaluated by its accuracy in classifying the stage of dementia and is visualized with accuracy/loss graphs and a detailed classification report.",
-            img1: "../static/images/Confusion_Matrix_Alz.png",
-            img2: "../static/images/Training_History_Alz.png"
+            img1: "../static/images/Training_History_Alz.png",
+            img2: "../static/images/Confusion_Matrix_Alz.png"
         },
         pdd: {
             title: "Parkinson's Disease Dementia (PDD) Model",
