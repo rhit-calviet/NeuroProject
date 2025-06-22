@@ -44,22 +44,22 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Tumor Type Classification Model",
             description: "This model is a deep convolutional neural network (CNN), likely based on a proven architecture like VGG16, ResNet, or a custom-designed structure. It was trained on the 'Brain Tumor MRI Images 44 Classes' dataset from Kaggle. The training process involved feeding the model thousands of labeled MRI images, allowing it to learn the distinct visual features—such as texture, shape, and contrast patterns—that differentiate between 44 types of brain tumors, including astrocytoma, glioblastoma, and normal tissue.",
             performance: "The model's performance is evaluated based on its accuracy in correctly classifying new, unseen MRI images. Key metrics include training and validation accuracy/loss curves, which show how well the model learned and generalized, and a confusion matrix, which provides a detailed breakdown of correct and incorrect predictions for each tumor type.",
-            img1: "https://placehold.co/400x300/e9ecef/495057?text=Accuracy/Loss+Graph",
-            img2: "https://placehold.co/400x300/e9ecef/495057?text=Confusion+Matrix"
+            img1: "../static/images/training_plot_tumor.png",
+            img2: "../static/images/confusion_matrix_tumor.png"
         },
         alzheimer: {
             title: "Alzheimer's Stage Classification Model",
             description: "This classification model utilizes a deep learning architecture trained on the 'Augmented Alzheimer MRI Dataset'. It has learned to identify subtle morphological changes in the brain that are characteristic of Alzheimer's disease progression, such as hippocampal atrophy and changes in cortical thickness. By analyzing these patterns, it can categorize a scan into one of four stages.",
             performance: "Performance is measured by its ability to correctly classify the stage of dementia. The accuracy/loss graphs illustrate the learning process, while the confusion matrix shows the model's performance in distinguishing between the 'Non Demented', 'Very Mild', 'Mild', and 'Moderate' stages. High accuracy in this task is crucial for its utility.",
-            img1: "https://placehold.co/400x300/e9ecef/495057?text=Training+Curves",
-            img2: "https://placehold.co/400x300/e9ecef/495057?text=Classification+Matrix"
+            img1: "../static/images/Training_History_Alz.png",
+            img2: "../static/images/Confusion_Matrix_Alz.png"
         },
-        flair: {
-            title: "FLAIR Abnormality Segmentation Model",
-            description: "This model is based on the U-Net architecture, which is the gold standard for biomedical image segmentation. It features an encoder-decoder structure with skip connections that allow it to capture both fine-grained detail and high-level context. It was trained on the 'LGG MRI Segmentation' dataset, learning to recognize and outline hyperintense (bright) pixels in FLAIR sequences, which are indicative of potential tumors.",
-            performance: "The model's success is measured by its ability to accurately match the ground-truth masks provided by human experts. Key performance metrics include the Dice Coefficient and Intersection over Union (IoU), which quantify the overlap between the predicted mask and the actual abnormality. The training history shows the model's convergence towards accurate segmentation.",
-            img1: "https://placehold.co/400x300/e9ecef/495057?text=IoU+Metric+Graph",
-            img2: "https://placehold.co/400x300/e9ecef/495057?text=Sample+Segmentation"
+        pdd: {
+            title: "Parkinson's Disease Dementia (PDD) Classification Model",
+            description: "This model is a deep convolutional neural network (CNN) trained to identify biomarkers associated with Parkinson's Disease Dementia from brain MRI scans. It analyzes textural and structural patterns to classify a scan as either 'PDD' or 'Healthy Control'. The training dataset consists of labeled images, enabling the model to learn the subtle differences between the two classes.",
+            performance: "Model performance is evaluated on its classification accuracy, precision, and recall. The goal is to correctly identify subjects with PDD while minimizing false positives. A confusion matrix shows the detailed performance breakdown between the 'PDD' and 'Healthy Control' classes.",
+            img1: "../static/images/training_plot_dem.png",
+            img2: "../static/images/confusion_matrix_dem.png"
         }
     };
 

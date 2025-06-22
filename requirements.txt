@@ -5,3 +5,7 @@ Pillow
 fpdf2
 pydicom
 opencv-python-headless
+google.generativeai
+pandas
+scikit-learn
+seaborn
