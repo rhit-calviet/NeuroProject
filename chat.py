@@ -1,7 +1,7 @@
 import os
 import google.generativeai as genai
 
-API_KEY = "AIzaSyBDVd1au8lRt6Z8uZuCJ2UCGWeusCr8yGY"
+API_KEY = "your_key"
 
 def chat(prompt, model = "gemini-1.5-flash-002"):
     # Configure Gemini
