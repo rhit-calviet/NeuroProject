@@ -29,7 +29,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 EXPECTED_MODELS = {
     'Parkinson\'s Disease Dementia Classification': {'file': 'dementia.h5', 'type': 'classification_pdd'},
     'Alzheimer\'s Stage Classification': {'file': 'alzhiemer.keras', 'type': 'classification_alzheimer'},
-    'Tumor Type Classification': {'file': 'tumor.keras', 'type': 'classification_tumor'}
+    'Tumor Type Classification': {'file': 'tumor_old.keras', 'type': 'classification_tumor'}
 }
 MODELS = {}
 ALZHEIMER_CLASSES = ['Mild Demented', 'Moderate Demented', 'Non Demented', 'Very Mild Demented']
