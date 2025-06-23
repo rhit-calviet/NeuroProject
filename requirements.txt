@@ -9,3 +9,4 @@ google.generativeai
 pandas
 scikit-learn
 seaborn
+gunicorn
