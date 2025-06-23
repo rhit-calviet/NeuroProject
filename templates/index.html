@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroScan AI - Advanced Brain Scan Analysis</title>
-    <link rel="icon" type="image/png" href="../static/images/icon.png">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,10 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-logo">NeuroScan AI</a>
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/icon.png') }}" alt="NeuroScan AI Logo" height="40">
+                <a href="/" class="nav-logo">NeuroScan AI</a>
+            </div>
             <ul class="nav-menu">
                 <li class="nav-item"><a href="#analyzer" class="nav-link">Analyzer</a></li>
                 <li class="nav-item"><a href="#how-it-works" class="nav-link">How It Works</a></li>

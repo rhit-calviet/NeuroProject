@@ -46,6 +46,16 @@ body {
     margin: 0 auto;
     padding: 0 2rem;
 }
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+.nav-container img {
+    height: 40px;
+    width: auto;
+    margin-right: 1rem;
+    border-radius: 4px;
+}
 .nav-logo {
     font-size: 1.5rem;
     font-weight: 700;
@@ -356,3 +366,5 @@ body {
     border-radius: 8px;
     box-shadow: var(--shadow-sm);
 }
+
+

@@ -135,6 +135,12 @@ def get_classification_interpretation(model_name, model_type, prediction_array):
 # --- MODIFICATION: ENHANCED PDF CLASS FOR BETTER FORMATTING ---
 class PDF(FPDF):
     def header(self):
+        # Add logo to top left corner
+        logo_path = os.path.join('static', 'images', 'icon.png')
+        if os.path.exists(logo_path):
+            self.image(logo_path, x=10, y=10, w=20)
+        
+        # Title and timestamp
         self.set_font('Helvetica', 'B', 14)
         self.cell(0, 10, 'AI-Powered Brain Scan Analysis Report', 0, 1, 'C')
         self.set_font('Helvetica', '', 9)
